@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var manager = LocationManager()
+    
     var body: some View {
+        let latetude = $manager.location.wrappedValue.coordinate.latitude
+        let longitude = $manager.location.wrappedValue.coordinate.longitude
+        
         VStack(alignment: .leading) {
             MapView()
+                .environmentObject(manager)
                 .ignoresSafeArea()
                 .frame(height: 300)
             Text("StarCamp")
                 .font(.title)
-            Text("Astro photography support tool")
+            Text("\(latetude), \(longitude)")
                 .font(.subheadline)
             Spacer()
         }
