@@ -10,6 +10,15 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var manager = LocationManager()
     
+    @State var dateText = ""
+    @State var nowDate = Date()
+    private let dateFormatter = DateFormatter()
+    
+    init() {
+        dateFormatter.dateFormat = "YYYY/MM/dd(E) \nHH:mm:ss"
+        dateFormatter.locale = Locale(identifier: "ja_jp")
+    }
+    
     var body: some View {
         let latetude = $manager.location.wrappedValue.coordinate.latitude
         let longitude = $manager.location.wrappedValue.coordinate.longitude
@@ -18,11 +27,25 @@ struct ContentView: View {
             MapView()
                 .environmentObject(manager)
                 .ignoresSafeArea()
-                .frame(height: 300)
-            Text("StarCamp")
-                .font(.title)
-            Text("\(latetude), \(longitude)")
-                .font(.subheadline)
+                .frame(height: 200)
+            
+            Text(dateText.isEmpty ? "\(dateFormatter.string(from: nowDate))" : dateText)
+                .onAppear {
+                    Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                        self.nowDate = Date()
+                        dateText = "\(dateFormatter.string(from: nowDate))"
+                    }
+                }
+            
+            HStack {
+                Text("Longitude:")
+                Text("\(longitude)")
+            }
+            HStack {
+                Text("Latetude:")
+                Text("\(latetude)")
+            }
+            
             Spacer()
         }
     }
