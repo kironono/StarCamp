@@ -9,11 +9,12 @@ import MapKit
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     let manager = CLLocationManager()
-    @Published var location = CLLocation()
     @Published var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 34.011_286, longitude: -116.166_868),
         span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
     )
+    @Published var lastSeenLocation: CLLocation?
+    @Published var currentPlacemark: CLPlacemark?
 
     override init() {
         super.init()
@@ -27,11 +28,19 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation]) {
-        self.location = locations.last!
+        lastSeenLocation = locations.first
+        fetchCountryAndCity(for: locations.first)
         self.region = MKCoordinateRegion(
-            center: location.coordinate,
+            center: lastSeenLocation?.coordinate ?? CLLocation().coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
         )
     }
-
+    
+    func fetchCountryAndCity(for location: CLLocation?) {
+        guard let location = location else { return }
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(location) { (placemarks, error) in
+            self.currentPlacemark = placemarks?.first
+        }
+    }
 }

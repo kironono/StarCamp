@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct ContentView: View {
-    @ObservedObject var manager = LocationManager()
+    @ObservedObject var locationManager = LocationManager()
     
     @State var dateText = ""
     @State var nowDate = Date()
@@ -20,12 +21,15 @@ struct ContentView: View {
     }
     
     var body: some View {
-        let latetude = $manager.location.wrappedValue.coordinate.latitude
-        let longitude = $manager.location.wrappedValue.coordinate.longitude
+        let latetude = locationManager.lastSeenLocation?.coordinate.latitude ?? 0
+        let longitude = locationManager.lastSeenLocation?.coordinate.longitude ?? 0
+        let altitude = locationManager.lastSeenLocation?.altitude ?? 0
+        let city = locationManager.currentPlacemark?.administrativeArea ?? ""
+        let locality = locationManager.currentPlacemark?.locality ?? ""
         
         VStack(alignment: .leading) {
             MapView()
-                .environmentObject(manager)
+                .environmentObject(locationManager)
                 .ignoresSafeArea()
                 .frame(height: 200)
             
@@ -45,7 +49,14 @@ struct ContentView: View {
                 Text("Latetude:")
                 Text("\(latetude)")
             }
-            
+            HStack {
+                Text("Altitude:")
+                Text("\(altitude)")
+            }
+            HStack {
+                Text("City:")
+                Text("\(locality), \(city)")
+            }
             Spacer()
         }
     }
