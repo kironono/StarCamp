@@ -15,6 +15,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     )
     @Published var lastSeenLocation: CLLocation?
     @Published var currentPlacemark: CLPlacemark?
+    @Published var heading: CLLocationDirection?
 
     override init() {
         super.init()
@@ -24,6 +25,10 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         self.manager.desiredAccuracy = kCLLocationAccuracyBest
         self.manager.distanceFilter = 2
         self.manager.startUpdatingLocation()
+        
+        self.manager.headingFilter = kCLHeadingFilterNone
+        self.manager.headingOrientation = .portrait
+        self.manager.startUpdatingHeading()
     }
 
     func locationManager(_ manager: CLLocationManager,
@@ -34,6 +39,11 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             center: lastSeenLocation?.coordinate ?? CLLocation().coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
         )
+    }
+    
+    func locationManager(_ manager: CLLocationManager,
+                         didUpdateHeading newHeading: CLHeading) {
+        heading = newHeading.magneticHeading
     }
     
     func fetchCountryAndCity(for location: CLLocation?) {

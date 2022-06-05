@@ -26,6 +26,7 @@ struct ContentView: View {
         let altitude = locationManager.lastSeenLocation?.altitude ?? 0
         let city = locationManager.currentPlacemark?.administrativeArea ?? ""
         let locality = locationManager.currentPlacemark?.locality ?? ""
+        let heading = locationManager.heading ?? 0
         
         VStack(alignment: .leading) {
             MapView()
@@ -56,6 +57,10 @@ struct ContentView: View {
             HStack {
                 Text("City:")
                 Text("\(locality), \(city)")
+            }
+            HStack {
+                Text("Heading:")
+                Text("\(heading)")
             }
             Spacer()
         }
